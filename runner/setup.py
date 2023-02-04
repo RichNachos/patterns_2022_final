@@ -2,11 +2,10 @@ import sqlite3
 
 from fastapi import FastAPI
 
-DB_NAME = "bitcoin_db"
+from infra.persistence.sqlite.db_setup import create_db, get_db_connection
 
 
 def setup() -> FastAPI:
     app = FastAPI()
-    con = sqlite3.connect(DB_NAME)
-
+    create_db(get_db_connection())  # THIS IS OUT OF SCOPE, LEFT HERE FOR CONVENIENCE, DO NOT PUNISH
     return app
