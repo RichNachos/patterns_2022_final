@@ -1,0 +1,16 @@
+httpx
+requests
+
+black
+isort
+flake8
+mypy
+
+pytest
+pytest-cov
+pytest-recording
+hypothesis
+faker
+
+fastapi
+uvicorn[standard]
