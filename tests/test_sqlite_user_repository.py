@@ -59,3 +59,10 @@ def test_create_duplicate_user(user_repo: UserRepository) -> None:
 
     assert user_repo.create_user(test_user1) is True
     assert user_repo.create_user(test_user2) is False
+
+
+def test_same_username(user_repo: UserRepository) -> None:
+    test_user1 = User("abc", "efg")
+
+    assert user_repo.create_user(test_user1) is True
+    assert user_repo.username_taken("abc") is True
