@@ -7,5 +7,8 @@ class WalletRepository(Protocol):
     def get_wallet(self, address: str) -> Wallet | None:
         pass
 
-    def create_wallet(self, user_token: str, wallet: Wallet) -> bool:
+    def get_wallets_by_user(self, user_token: str) -> list[Wallet]:
+        pass
+
+    def create_wallet(self, wallet: Wallet) -> bool:
         pass
