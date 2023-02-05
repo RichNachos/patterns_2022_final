@@ -30,27 +30,17 @@ def repo() -> SqliteTransactionRepository:
 def test_add_transaction(repo: SqliteTransactionRepository) -> None:
     transaction = Transaction("address1", "address2", Decimal(0.1), Decimal(10))
     repo.add_transaction(transaction)
-    assert len(repo.get_all_transactions()) == 1
-    assert repo.get_all_transactions()[0].from_wallet_address == "address1"
-    assert repo.get_all_transactions()[0].to_wallet_address == "address2"
-    assert repo.get_all_transactions()[0].fee == Decimal(0.1)
+    assert repo.get_all_transactions() == [transaction]
 
 
-# This test requires wallet table rows in order to work properly
 def test_get_transactions(repo: SqliteTransactionRepository) -> None:
-    transaction1 = Transaction("address1", "address2", Decimal(0.1), Decimal(10))
+    transaction1 = Transaction("address1", "address3", Decimal(0.1), Decimal(10))
     transaction2 = Transaction("address2", "address3", Decimal(0.2), Decimal(10))
-    transaction3 = Transaction("address3", "address4", Decimal(0.3), Decimal(10))
+    transaction3 = Transaction("address4", "address2", Decimal(0.3), Decimal(10))
     repo.add_transaction(transaction1)
     repo.add_transaction(transaction2)
     repo.add_transaction(transaction3)
-    assert len(repo.get_transactions("address2")) == 2
-    assert repo.get_transactions("address2")[0].from_wallet_address == "address1"
-    assert repo.get_transactions("address2")[0].to_wallet_address == "address2"
-    assert repo.get_transactions("address2")[0].fee == Decimal(0.1)
-    assert repo.get_transactions("address2")[1].from_wallet_address == "address2"
-    assert repo.get_transactions("address2")[1].to_wallet_address == "address3"
-    assert repo.get_transactions("address2")[1].fee == Decimal(0.2)
+    assert repo.get_transactions("address2") == [transaction2, transaction3]
 
 
 def test_get_all_transactions(repo: SqliteTransactionRepository) -> None:
@@ -60,13 +50,4 @@ def test_get_all_transactions(repo: SqliteTransactionRepository) -> None:
     repo.add_transaction(transaction1)
     repo.add_transaction(transaction2)
     repo.add_transaction(transaction3)
-    assert len(repo.get_all_transactions()) == 3
-    assert repo.get_all_transactions()[0].from_wallet_address == "address1"
-    assert repo.get_all_transactions()[0].to_wallet_address == "address2"
-    assert repo.get_all_transactions()[0].fee == Decimal(0.1)
-    assert repo.get_all_transactions()[1].from_wallet_address == "address2"
-    assert repo.get_all_transactions()[1].to_wallet_address == "address3"
-    assert repo.get_all_transactions()[1].fee == Decimal(0.2)
-    assert repo.get_all_transactions()[2].from_wallet_address == "address3"
-    assert repo.get_all_transactions()[2].to_wallet_address == "address4"
-    assert repo.get_all_transactions()[2].fee == Decimal(0.3)
+    assert repo.get_all_transactions() == [transaction1, transaction2, transaction3]
