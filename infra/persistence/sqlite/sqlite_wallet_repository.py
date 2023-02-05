@@ -42,7 +42,9 @@ class SqliteWalletRepository:
 
         return wallet_list
 
-    def update_wallet_balance_if_exists(self, wallet_address: str, new_balance: Decimal) -> None:
+    def update_wallet_balance_if_exists(
+        self, wallet_address: str, new_balance: Decimal
+    ) -> None:
         cursor = self._con.cursor()
         cursor.execute(
             "UPDATE wallets set balance = ? where address = ?",

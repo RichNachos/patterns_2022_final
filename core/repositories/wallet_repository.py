@@ -8,7 +8,9 @@ class WalletRepository(Protocol):
     def get_wallet(self, address: str) -> Wallet | None:
         pass
 
-    def update_wallet_balance_if_exists(self, wallet_address: str, new_balance: Decimal) -> None:
+    def update_wallet_balance_if_exists(
+        self, wallet_address: str, new_balance: Decimal
+    ) -> None:
         pass
 
     def get_wallets_by_user(self, user_token: str) -> list[Wallet]:

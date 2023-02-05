@@ -1,0 +1,79 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.28.1
+    method: GET
+    uri: https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&precision=full
+  response:
+    body:
+      string: !!binary |
+        gxKAeyJiaXRjb2luIjp7InVzZCI6MjI4ODIuOTUwNDc1MjYyNzE0fX0D
+    headers:
+      Access-Control-Allow-Headers:
+      - Origin, X-Requested-With, Content-Type, Accept, Authorization
+      Access-Control-Allow-Methods:
+      - POST, PUT, DELETE, GET, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - link, per-page, total
+      Access-Control-Request-Method:
+      - '*'
+      Alternate-Protocol:
+      - 443:npn-spdy/2
+      CF-Cache-Status:
+      - EXPIRED
+      CF-RAY:
+      - 794eae8b19ea95a6-TBS
+      Cache-Control:
+      - public, max-age=120
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - br
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sun, 05 Feb 2023 21:19:00 GMT
+      ETag:
+      - W/"af0945ffd0870379f2e556dd1a24ae07"
+      Expires:
+      - Sun, 05 Feb 2023 21:21:00 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cf_bm=HZi4sx1vbLmGdZjUxKyJriG3zjc8QojY0o39bgrq.bc-1675631940-0-AUpNqYUkGFbUSoGOwWGLTfElNAt+31/ViJCqtECeEGm9dYt+ypF8b+aow54x0b4sbeMYkJKYNkMk/0i8+v//wJI=;
+        path=/; expires=Sun, 05-Feb-23 21:49:00 GMT; domain=.api.coingecko.com; HttpOnly;
+        Secure; SameSite=None
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Request-Id:
+      - f68acb71-c3db-49b6-b1a6-589935554045
+      X-Runtime:
+      - '0.009236'
+      X-XSS-Protection:
+      - '0'
+    status:
+      code: 200
+      message: OK
+version: 1

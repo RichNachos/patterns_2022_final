@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from decimal import Decimal
 from enum import Enum
-from typing import Generic, Protocol, TypeVar
+from typing import Protocol
 
 from core.interactors.rate_provider import RateProvider
 from core.interactors.tokens import TokenProvider
@@ -14,19 +14,9 @@ class WalletStatus(Enum):
     WALLET_NOT_FOUND = 0
     UNAUTHORIZED = 1
     WALLET_LIMIT_EXCEEDED = 2
-    WALLET_BALANCE_INSUFFICIENT = 3
     FAILED_TO_GET_RATE = 4
     ERROR = 5
     SUCCESS = 6
-
-
-T = TypeVar("T")
-
-
-@dataclass
-class WalletResponse(Generic[T]):
-    status: WalletStatus
-    value: T
 
 
 @dataclass
@@ -36,13 +26,17 @@ class WalletInfo:
     balance_usd: Decimal
 
 
+@dataclass
+class WalletResponse:
+    status: WalletStatus
+    value: WalletInfo | None
+
+
 class WalletInteractor(Protocol):
-    def create_wallet(self, user_token: str) -> WalletResponse[WalletInfo | None]:
+    def create_wallet(self, user_token: str) -> WalletResponse:
         pass
 
-    def get_wallet(
-        self, wallet_address: str, user_token: str
-    ) -> WalletResponse[WalletInfo | None]:
+    def get_wallet(self, wallet_address: str, user_token: str) -> WalletResponse:
         pass
 
 
@@ -54,26 +48,31 @@ class BitcoinServiceWalletInteractor:
         wallet_repo: WalletRepository,
         rate_provider: RateProvider,
         initial_deposit: Decimal,
+        max_wallets: int,
     ):
         self._token_provider = token_provider
         self._user_repo = user_repo
         self._wallet_repo = wallet_repo
         self._rate_provider = rate_provider
         self._initial_deposit = initial_deposit
+        self._max_wallets = max_wallets
 
-    def create_wallet(self, user_token: str) -> WalletResponse[WalletInfo | None]:
+    def _fetch_and_make_wallet_info(self, wallet: Wallet) -> WalletInfo | None:
+        rate = self._rate_provider.fetch()
+        if rate is None:
+            return None
+        wallet_info = WalletInfo(wallet.address, wallet.balance, wallet.balance * rate)
+        return wallet_info
+
+    def create_wallet(self, user_token: str) -> WalletResponse:
         user = self._user_repo.get_user(user_token)
 
         if user is None:
             return WalletResponse(WalletStatus.UNAUTHORIZED, None)
 
         wallets = self._wallet_repo.get_wallets_by_user(user_token)
-        if len(wallets) >= 3:
+        if len(wallets) >= self._max_wallets:
             return WalletResponse(WalletStatus.WALLET_LIMIT_EXCEEDED, None)
-
-        rate = self._rate_provider.fetch()
-        if rate is None:
-            return WalletResponse(WalletStatus.FAILED_TO_GET_RATE, None)
 
         new_wallet = Wallet(
             self._token_provider.provide_token(),
@@ -81,17 +80,18 @@ class BitcoinServiceWalletInteractor:
             user_token,
         )
 
+        wallet_info = self._fetch_and_make_wallet_info(new_wallet)
+
+        if wallet_info is None:
+            return WalletResponse(WalletStatus.FAILED_TO_GET_RATE, None)
+
         if self._wallet_repo.create_wallet(new_wallet):
-            wallet_info = WalletInfo(
-                new_wallet.address, new_wallet.balance, new_wallet.balance * rate
-            )
             return WalletResponse(WalletStatus.SUCCESS, wallet_info)
 
         return WalletResponse(WalletStatus.ERROR, None)
 
-    def get_wallet(
-        self, wallet_address: str, user_token: str
-    ) -> WalletResponse[WalletInfo | None]:
+    def get_wallet(self, wallet_address: str, user_token: str) -> WalletResponse:
+
         wallet = self._wallet_repo.get_wallet(wallet_address)
 
         if wallet is None:
@@ -100,9 +100,7 @@ class BitcoinServiceWalletInteractor:
         if wallet.owner_token != user_token:
             return WalletResponse(WalletStatus.UNAUTHORIZED, None)
 
-        rate = self._rate_provider.fetch()
-        if rate is None:
+        wallet_info = self._fetch_and_make_wallet_info(wallet)
+        if wallet_info is None:
             return WalletResponse(WalletStatus.FAILED_TO_GET_RATE, None)
-
-        wallet_info = WalletInfo(wallet.address, wallet.balance, rate * wallet.balance)
         return WalletResponse(WalletStatus.SUCCESS, wallet_info)
