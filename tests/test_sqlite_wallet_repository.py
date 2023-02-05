@@ -46,14 +46,10 @@ def test_get_wallet_correct(repo: WalletRepository) -> None:
     assert wallet1 == wallet2
 
 
-def test_update_balance_wrong_address(repo: WalletRepository) -> None:
-    assert not repo.update_wallet_balance("wrong", Decimal(5))
-
-
 def test_update_balance_correct(repo: WalletRepository) -> None:
     wallet = Wallet("test", Decimal("5"), "test1")
     repo.create_wallet(wallet)
-    repo.update_wallet_balance(wallet.address, Decimal("10"))
+    repo.update_wallet_balance_if_exists(wallet.address, Decimal("10"))
 
     wallet2 = repo.get_wallet(wallet.address)
     assert wallet2 is not None
