@@ -42,6 +42,20 @@ class SqliteWalletRepository:
 
         return wallet_list
 
+    def update_wallet_balance(self, wallet_address: str, new_balance: Decimal) -> bool:
+        cursor = self._con.cursor()
+        cursor.execute(
+            "UPDATE wallets set balance = ? where address = ?",
+            [str(new_balance), wallet_address],
+        )
+
+        if cursor.rowcount != 1:
+            self._con.rollback()
+            return False
+
+        self._con.commit()
+        return True
+
     def create_wallet(self, wallet: Wallet) -> bool:
         user = (
             self._con.cursor()
