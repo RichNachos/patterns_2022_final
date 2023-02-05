@@ -16,10 +16,13 @@ def repo() -> SqliteTransactionRepository:
     create_db(conn)
     insert_rows = [
         "INSERT INTO users (username, token) VALUES ('user1', 'token1');",
+        "INSERT INTO users (username, token) VALUES ('user2', 'token2');"
         "INSERT INTO wallets (address, user_id, balance) VALUES ('address1', 1, 0);",
         "INSERT INTO wallets (address, user_id, balance) VALUES ('address2', 1, 0);",
         "INSERT INTO wallets (address, user_id, balance) VALUES ('address3', 1, 0);",
         "INSERT INTO wallets (address, user_id, balance) VALUES ('address4', 1, 0);",
+        "INSERT INTO wallets (address, user_id, balance) VALUES ('address5', 2, 0);",
+        "INSERT INTO wallets (address, user_id, balance) VALUES ('address6', 2, 0);",
     ]
     for statement in insert_rows:
         conn.cursor().executescript(statement)
@@ -41,6 +44,22 @@ def test_get_transactions(repo: SqliteTransactionRepository) -> None:
     repo.add_transaction(transaction2)
     repo.add_transaction(transaction3)
     assert repo.get_transactions("address2") == [transaction2, transaction3]
+
+
+def test_get_user_transactions(repo: SqliteTransactionRepository) -> None:
+    transaction1 = Transaction("address1", "address2", Decimal(0.1), Decimal(5))
+    transaction2 = Transaction("address1", "address5", Decimal(0.2), Decimal(10))
+    transaction3 = Transaction("address5", "address6", Decimal(0.3), Decimal(15))
+
+    repo.add_transaction(transaction1)
+    repo.add_transaction(transaction2)
+    repo.add_transaction(transaction3)
+
+    res = repo.get_user_transactions("token1")
+
+    assert transaction1 in res
+    assert transaction2 in res
+    assert transaction3 not in res
 
 
 def test_get_all_transactions(repo: SqliteTransactionRepository) -> None:

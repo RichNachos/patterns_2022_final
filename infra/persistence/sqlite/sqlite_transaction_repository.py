@@ -48,6 +48,19 @@ class SqliteTransactionRepository(TransactionRepository):
         )
         return result_to_list(cursor)
 
+    def get_user_transactions(self, user_token: str) -> list[Transaction]:
+        cursor = self.conn.cursor()
+        cursor.execute(
+            "SELECT wf.address, wt.address, t.fee, t.amount FROM transactions t "
+            "JOIN wallets wf ON wf.id = t.from_wallet_id "
+            "JOIN wallets wt ON wt.id = t.to_wallet_id "
+            "JOIN users u ON wt.user_id = u.id OR wf.user_id = u.id "
+            "WHERE u.token = (?)",
+            (user_token,),
+        )
+
+        return result_to_list(cursor)
+
     def get_all_transactions(self) -> list[Transaction]:
         cursor = self.conn.cursor()
         cursor.execute(
