@@ -31,7 +31,7 @@ def test_transaction_service_unauthorized() -> None:
     assert interactor.get_statistics("some token").status == AdminStatus.UNAUTHORIZED
 
 
-def test_authorized_transaction_service_authorized_correct_transactions() -> None:
+def test_transaction_service_authorized_correct_transactions() -> None:
     transactions = [
         Transaction("1", "2", Decimal(2), Decimal(1)),
         Transaction("2", "1", Decimal(3), Decimal(1)),
