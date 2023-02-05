@@ -64,11 +64,9 @@ def test_create_wallet_basic(basic_wallet_repo: WalletRepository) -> None:
 
     wallet_interactor = BitcoinServiceWalletInteractor(
         token_provider=get_token_provider("abc"),
-        transaction_repo=get_transaction_repo([]),
         user_repo=get_user_repo(User("abc", "abc")),
         wallet_repo=basic_wallet_repo,
         rate_provider=get_rate_provider(Decimal("15.5")),
-        fee_provider=get_fee_provider(Decimal("1.0")),
         initial_deposit=Decimal("1.0"),
     )
 
@@ -82,11 +80,9 @@ def test_create_wallet_non_existent_user(basic_wallet_repo: WalletRepository) ->
 
     wallet_interactor = BitcoinServiceWalletInteractor(
         token_provider=get_token_provider("abc"),
-        transaction_repo=get_transaction_repo([]),
         user_repo=get_user_repo(None),
         wallet_repo=basic_wallet_repo,
         rate_provider=get_rate_provider(Decimal("15.5")),
-        fee_provider=get_fee_provider(Decimal("1.0")),
         initial_deposit=Decimal("1.0"),
     )
 
@@ -100,11 +96,9 @@ def test_create_wallet_rate_get_failed(basic_wallet_repo: WalletRepository) -> N
 
     wallet_interactor = BitcoinServiceWalletInteractor(
         token_provider=get_token_provider("abc"),
-        transaction_repo=get_transaction_repo([]),
         user_repo=get_user_repo(User("abc", "abc")),
         wallet_repo=basic_wallet_repo,
         rate_provider=get_rate_provider(None),
-        fee_provider=get_fee_provider(Decimal("1.0")),
         initial_deposit=Decimal("1.0"),
     )
 
@@ -121,15 +115,13 @@ def test_create_wallet_repo_error() -> None:
 
     wallet_interactor = BitcoinServiceWalletInteractor(
         token_provider=get_token_provider("efg"),
-        transaction_repo=get_transaction_repo([]),
         user_repo=get_user_repo(User("efg", "efg")),
         wallet_repo=wallet_repo,
-        rate_provider=get_rate_provider(None),
-        fee_provider=get_fee_provider(Decimal("1.0")),
+        rate_provider=get_rate_provider(Decimal("1.5")),
         initial_deposit=Decimal("1.0"),
     )
 
-    result = wallet_interactor.create_wallet("abc")
+    result = wallet_interactor.create_wallet("efg")
     assert result.status == WalletStatus.ERROR
     assert result.value is None
 
@@ -141,66 +133,70 @@ def test_get_wallet_basic() -> None:
 
     wallet_interactor = BitcoinServiceWalletInteractor(
         token_provider=get_token_provider("efg"),
-        transaction_repo=get_transaction_repo([]),
         user_repo=get_user_repo(User("efg", "efg")),
         wallet_repo=wallet_repo,
-        rate_provider=get_rate_provider(None),
-        fee_provider=get_fee_provider(Decimal("1.0")),
+        rate_provider=get_rate_provider(Decimal("10")),
         initial_deposit=Decimal("1.0"),
     )
 
-    result = wallet_interactor.create_wallet("abc")
-    assert result.status == WalletStatus.ERROR
-    assert result.value is None
+    result = wallet_interactor.get_wallet("123", "abc")
+
+    expected = WalletInfo("123", Decimal("1.2"), Decimal("12"))
+    assert result.status == WalletStatus.SUCCESS
+    assert result.value == expected
 
 
 def test_get_wallet_non_existent_wallet() -> None:
-    pass
+    wallet_repo = unittest.mock.Mock()
+    wallet_repo.get_wallet.return_value = None
 
+    wallet_interactor = BitcoinServiceWalletInteractor(
+        token_provider=get_token_provider("efg"),
+        user_repo=get_user_repo(User("efg", "efg")),
+        wallet_repo=wallet_repo,
+        rate_provider=get_rate_provider(Decimal("10")),
+        initial_deposit=Decimal("1.0"),
+    )
 
-def test_get_wallet_user_doesnt_exist() -> None:
-    pass
+    result = wallet_interactor.get_wallet("123", "abc")
+
+    assert result.status == WalletStatus.WALLET_NOT_FOUND
+    assert result.value is None
 
 
 def test_get_wallet_user_doesnt_match() -> None:
-    pass
+
+    wallet_repo = unittest.mock.Mock()
+    wallet_repo.get_wallet.return_value = Wallet("123", Decimal("1.2"), "abc")
+
+    wallet_interactor = BitcoinServiceWalletInteractor(
+        token_provider=get_token_provider("abc"),
+        user_repo=get_user_repo(None),
+        wallet_repo=wallet_repo,
+        rate_provider=get_rate_provider(Decimal("1.0")),
+        initial_deposit=Decimal("1.0"),
+    )
+
+    result = wallet_interactor.get_wallet("123", "123")
+
+    assert result.status == WalletStatus.UNAUTHORIZED
+    assert result.value is None
 
 
 def test_get_wallet_rate_get_failed() -> None:
-    pass
 
+    wallet_repo = unittest.mock.Mock()
+    wallet_repo.get_wallet.return_value = Wallet("123", Decimal("1.2"), "abc")
 
-def test_do_transaction_basic() -> None:
-    pass
+    wallet_interactor = BitcoinServiceWalletInteractor(
+        token_provider=get_token_provider("abc"),
+        user_repo=get_user_repo(None),
+        wallet_repo=wallet_repo,
+        rate_provider=get_rate_provider(None),
+        initial_deposit=Decimal("1.0"),
+    )
 
+    result = wallet_interactor.get_wallet("123", "abc")
 
-def test_do_transaction_wallet_from_non_existent() -> None:
-    pass
-
-
-def test_do_transaction_wallet_to_non_existent() -> None:
-    pass
-
-
-def test_do_transaction_user_token_wrong() -> None:
-    pass
-
-
-def test_get_transactions_basic() -> None:
-    pass
-
-
-def test_get_transactions_user_non_existent() -> None:
-    pass
-
-
-def test_get_transactions_by_wallet_basic() -> None:
-    pass
-
-
-def test_get_transactions_by_wallet_wallet_non_existent() -> None:
-    pass
-
-
-def test_get_transactions_by_wallet_user_token_wrong() -> None:
-    pass
+    assert result.status == WalletStatus.FAILED_TO_GET_RATE
+    assert result.value is None
