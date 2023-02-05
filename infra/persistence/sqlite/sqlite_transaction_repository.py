@@ -6,6 +6,16 @@ from core.models.transaction import Transaction
 from core.repositories.transaction_repository import TransactionRepository
 
 
+def result_to_list(result: Cursor) -> list[Transaction]:
+    data = result.fetchall()
+    transaction_list = []
+    for row in data:
+        transaction_list.append(
+            Transaction(row[0], row[1], Decimal(row[2]), Decimal(row[3]))
+        )
+    return transaction_list
+
+
 @dataclass
 class SqliteTransactionRepository(TransactionRepository):
     conn: Connection
@@ -29,32 +39,23 @@ class SqliteTransactionRepository(TransactionRepository):
 
     def get_transactions(self, wallet_address: str) -> list[Transaction]:
         cursor = self.conn.cursor()
-        result = cursor.execute(
+        cursor.execute(
             "SELECT wf.address,wt.address,t.fee,t.amount FROM transactions t "
             "JOIN wallets wf ON t.from_wallet_id = wf.id "
             "JOIN wallets wt ON t.to_wallet_id = wt.id "
             "WHERE wf.address = ? OR wt.address = ?",
             [wallet_address, wallet_address],
         )
-        return self.result_to_list(result)
+        return result_to_list(cursor)
 
     def get_all_transactions(self) -> list[Transaction]:
         cursor = self.conn.cursor()
-        result = cursor.execute(
+        cursor.execute(
             "SELECT wf.address,wt.address,t.fee,t.amount FROM transactions t "
             "JOIN wallets wf ON t.from_wallet_id = wf.id "
             "JOIN wallets wt ON t.to_wallet_id = wt.id "
         )
-        return self.result_to_list(result)
-
-    def result_to_list(self, result: Cursor) -> list[Transaction]:
-        data = result.fetchall()
-        transaction_list = []
-        for row in data:
-            transaction_list.append(
-                Transaction(row[0], row[1], Decimal(row[2]), Decimal(row[3]))
-            )
-        return transaction_list
+        return result_to_list(cursor)
 
     def get_wallet_id(self, address: str) -> int:
         cursor = self.conn.cursor()
