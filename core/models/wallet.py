@@ -6,3 +6,4 @@ from decimal import Decimal
 class Wallet:
     address: str
     balance: Decimal
+    owner_token: str
