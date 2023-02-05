@@ -13,8 +13,8 @@ class TokenProvider(Protocol):
 
 
 class RandomHexTokenProvider:
-    def __init__(self, token_len: int):
-        self._token_len = token_len
+    def __init__(self, token_len_bytes: int):
+        self._token_len = token_len_bytes
 
     def provide_token(self) -> str:
         return secrets.token_hex(self._token_len)
