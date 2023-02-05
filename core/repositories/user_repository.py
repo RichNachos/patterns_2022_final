@@ -9,3 +9,6 @@ class UserRepository(Protocol):
 
     def get_user(self, token: str) -> User | None:
         pass
+
+    def username_taken(self, username: str) -> bool:
+        pass

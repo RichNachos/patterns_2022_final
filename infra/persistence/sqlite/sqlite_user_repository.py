@@ -37,3 +37,12 @@ class SqliteUserRepository:
             return None
 
         return User(row[1], row[2])
+
+    def username_taken(self, username: str) -> bool:
+        cursor = self.conn.cursor()
+
+        cursor.execute("SELECT * FROM users WHERE users.username = (?)", (username,))
+        row = cursor.fetchall()
+        if len(row) == 0:
+            return False
+        return True
