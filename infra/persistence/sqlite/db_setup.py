@@ -19,7 +19,7 @@ def create_db(con: Connection) -> None:
         "UNIQUE (address))",
         "CREATE TABLE IF NOT EXISTS transactions"
         "(id INTEGER PRIMARY KEY AUTOINCREMENT, from_wallet_id INTEGER, "
-        " to_wallet_id INTEGER, fee VARCHAR,"
+        " to_wallet_id INTEGER, fee VARCHAR, amount VARCHAR, "
         "FOREIGN KEY (from_wallet_id) REFERENCES wallets (id),"
         "FOREIGN KEY (to_wallet_id) REFERENCES wallets (id))",
     ]

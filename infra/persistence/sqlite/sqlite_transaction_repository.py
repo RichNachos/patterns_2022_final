@@ -16,12 +16,13 @@ class SqliteTransactionRepository(TransactionRepository):
         id2 = self.get_wallet_id(transaction.to_wallet_address)
 
         cursor.execute(
-            "INSERT INTO transactions (from_wallet_id, to_wallet_id, fee) "
-            "VALUES (?,?,?)",
+            "INSERT INTO transactions (from_wallet_id, to_wallet_id, fee, amount) "
+            "VALUES (?,?,?,?)",
             [
                 id1,
                 id2,
                 transaction.fee.__str__(),
+                transaction.amount.__str__(),
             ],
         )
         self.conn.commit()
@@ -29,7 +30,7 @@ class SqliteTransactionRepository(TransactionRepository):
     def get_transactions(self, wallet_address: str) -> list[Transaction]:
         cursor = self.conn.cursor()
         result = cursor.execute(
-            "SELECT wf.address,wt.address,t.fee FROM transactions t "
+            "SELECT wf.address,wt.address,t.fee,t.amount FROM transactions t "
             "JOIN wallets wf ON t.from_wallet_id = wf.id "
             "JOIN wallets wt ON t.to_wallet_id = wt.id "
             "WHERE wf.address = ? OR wt.address = ?",
@@ -40,7 +41,7 @@ class SqliteTransactionRepository(TransactionRepository):
     def get_all_transactions(self) -> list[Transaction]:
         cursor = self.conn.cursor()
         result = cursor.execute(
-            "SELECT wf.address,wt.address,t.fee FROM transactions t "
+            "SELECT wf.address,wt.address,t.fee,t.amount FROM transactions t "
             "JOIN wallets wf ON t.from_wallet_id = wf.id "
             "JOIN wallets wt ON t.to_wallet_id = wt.id "
         )
@@ -50,7 +51,9 @@ class SqliteTransactionRepository(TransactionRepository):
         data = result.fetchall()
         transaction_list = []
         for row in data:
-            transaction_list.append(Transaction(row[0], row[1], Decimal(row[2])))
+            transaction_list.append(
+                Transaction(row[0], row[1], Decimal(row[2]), Decimal(row[3]))
+            )
         return transaction_list
 
     def get_wallet_id(self, address: str) -> int:
