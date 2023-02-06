@@ -16,3 +16,4 @@ fastapi
 uvicorn[standard]
 
 starlette
+types-requests

@@ -36,7 +36,6 @@ def get_wallet_interactor(
     initial_deposit: Decimal = Decimal(1),
     max_wallets: int = 3,
 ) -> WalletInteractor:
-
     return BitcoinServiceWalletInteractor(
         token_provider=token_provider,
         user_repo=user_repo,
@@ -48,7 +47,6 @@ def get_wallet_interactor(
 
 
 def test_create_wallet_basic() -> None:
-
     wallet_interactor = get_wallet_interactor()
 
     result = wallet_interactor.create_wallet("test")
@@ -58,7 +56,6 @@ def test_create_wallet_basic() -> None:
 
 
 def test_create_wallet_non_existent_user() -> None:
-
     wallet_interactor = get_wallet_interactor(user_repo=get_user_repo(None))
 
     result = wallet_interactor.create_wallet("abc")
@@ -68,7 +65,6 @@ def test_create_wallet_non_existent_user() -> None:
 
 
 def test_create_wallet_rate_get_failed() -> None:
-
     wallet_interactor = get_wallet_interactor(rate_provider=get_rate_provider(None))
 
     result = wallet_interactor.create_wallet("abc")
@@ -95,7 +91,6 @@ def test_create_wallet_limit_exceeded() -> None:
 
 
 def test_get_wallet_basic() -> None:
-
     wallet_interactor = get_wallet_interactor()
 
     result = wallet_interactor.get_wallet("test", "test")

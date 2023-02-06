@@ -91,7 +91,6 @@ class BitcoinServiceWalletInteractor:
         return WalletResponse(WalletStatus.ERROR, None)
 
     def get_wallet(self, wallet_address: str, user_token: str) -> WalletResponse:
-
         wallet = self._wallet_repo.get_wallet(wallet_address)
 
         if wallet is None:

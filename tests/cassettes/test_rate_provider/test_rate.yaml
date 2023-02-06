@@ -15,7 +15,7 @@ interactions:
   response:
     body:
       string: !!binary |
-        gxKAeyJiaXRjb2luIjp7InVzZCI6MjI4ODIuOTUwNDc1MjYyNzE0fX0D
+        eyJiaXRjb2luIjp7InVzZCI6MjI4ODIuOTUwNDc1MjYyNzE0fX0=
     headers:
       Access-Control-Allow-Headers:
       - Origin, X-Requested-With, Content-Type, Accept, Authorization
