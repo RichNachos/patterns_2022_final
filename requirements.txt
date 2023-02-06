@@ -1,19 +1,21 @@
 httpx
-requests
+requests~=2.28.1
 
 black
 isort
 flake8
 mypy
 
-pytest
+pytest~=7.1.2
 pytest-cov
 pytest-recording
 hypothesis
 faker
 
-fastapi
-uvicorn[standard]
+fastapi~=0.88.0
+uvicorn[standard]~=0.20.0
 
-starlette
+starlette~=0.22.0
 types-requests
+
+pydantic~=1.10.4
