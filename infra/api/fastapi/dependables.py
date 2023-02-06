@@ -1,15 +1,12 @@
 from fastapi import APIRouter
 from starlette.requests import Request
 
+from core.facade import BitcoinService
+
 user_api = APIRouter()
 admin_api = APIRouter()
 
 
-# Boilerplate
-class BitcoinService:
-    pass
-
-
 def get_core(request: Request) -> BitcoinService:
-    assert isinstance(request.app.state.core, BitcoinService)
-    return request.app.state.core
+    service: BitcoinService = request.app.state.core
+    return service

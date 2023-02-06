@@ -1,6 +1,7 @@
 from fastapi import Depends
 
-from infra.api.fastapi.dependables import BitcoinService, get_core, user_api
+from core.facade import BitcoinService
+from infra.api.fastapi.dependables import get_core, user_api
 
 
 @user_api.post("/transactions")
