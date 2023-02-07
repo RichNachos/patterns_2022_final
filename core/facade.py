@@ -68,7 +68,7 @@ class AwesomeBitcoinService:
     def get_wallet_transactions(
         self, token: str, address: str
     ) -> TransactionResponse[list[Transaction]]:
-        return self.transaction_interactor.get_transactions_by_wallet(token, address)
+        return self.transaction_interactor.get_transactions_by_wallet(address, token)
 
     def get_statistics(self, token: str) -> AdminResponse:
         return self.admin_interactor.get_statistics(token)
