@@ -1,7 +1,6 @@
 from decimal import Decimal
-from http.client import HTTPException
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from core.facade import BitcoinService

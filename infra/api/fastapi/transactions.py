@@ -1,8 +1,7 @@
 from decimal import Decimal
-from http.client import HTTPException
 
-from fastapi import APIRouter, Depends
-from pydantic import BaseModel
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel, validator
 
 from core.facade import BitcoinService
 from core.interactors.transaction_interactor import TransactionStatus
@@ -28,6 +27,13 @@ class TransactionRequestSchema(BaseModel):
     from_wallet: str
     to_wallet: str
     amount: Decimal
+
+    # noinspection PyMethodParameters
+    @validator("amount")
+    def prevent_negative(_, v: Decimal) -> Decimal:
+        if v <= 0:
+            raise HTTPException(422, "Illegal Transaction Amount")
+        return v
 
 
 def handle_transaction_status(status: TransactionStatus) -> None:
